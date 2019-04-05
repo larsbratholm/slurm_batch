@@ -23,4 +23,4 @@ The jobs in `xaa` can be submitted by `./submit_g09_array xaa`.
 [submit_g09_node](./submit_g09_node) is an example file of how to submit Gaussian09 jobs in cases where you need to reserve an entire node.
 Since your calculations might not scale linearly with cpu's, the jobs are allocated on the reserved cpu's using [GNU parallel](https://www.gnu.org/software/parallel/), by Ole Tange.
 The partition, number of cpu's, memory and program is hardcoded, but the file serves as an example.
-The jobs in `xaa` can be submitted by `./submit_g09_array xaa`.
+The jobs in `xaa` can be submitted by `./submit_g09_node xaa`.
