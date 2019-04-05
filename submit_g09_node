@@ -1,0 +1,37 @@
+#!/bin/bash
+IN=$1
+SUBMIT=${IN%.*}
+PWD=`pwd`
+
+cat > $SUBMIT <<!EOF
+#!/bin/bash
+#SBATCH --cpus-per-task=1
+#SBATCH --ntasks=14
+#SBATCH --mem=56gb
+#SBATCH --time=14-0
+#SBATCH --partition=cpu
+#SBATCH --nodes=1
+
+export OMP_NUM_THREADS=1
+
+export GAUSS_SCRDIR=/tmp/\$SLURM_JOB_ID/
+export GAUSS_EXEDIR=$HOME/scratch/opt/g09E/
+
+cd $PWD
+
+mkdir /tmp/\$SLURM_JOB_ID/
+mkdir \$GAUSS_SCRDIR
+
+srun="srun --exclusive -N1 -n1"
+parallel="parallel --delay 0.2 -j \$SLURM_NTASKS --joblog runtask.log --resume"
+
+top -bn 10 | grep 'init' --line-buffered | tee top-output.txt
+
+cat $IN | \$parallel "\$GAUSS_EXEDIR/g09 {}"
+
+# Remove scratch folder
+rm -rf \$GAUSS_SCRDIR
+
+!EOF
+
+sbatch $SUBMIT

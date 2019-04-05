@@ -1,0 +1,37 @@
+#!/bin/bash
+IN=$1
+SUBMIT=${IN%.*}
+PWD=`pwd`
+
+NFILES=$(wc -l < $IN)
+
+cat > $SUBMIT <<!EOF
+#!/bin/bash
+#SBATCH --cpus-per-task=1
+#SBATCH --ntasks=1
+#SBATCH --mem=4gb
+#SBATCH --time=2-0
+#SBATCH --partition=serial
+#SBATCH --array=1-$NFILES
+
+export OMP_NUM_THREADS=1
+
+export GAUSS_SCRDIR=/tmp/\$SLURM_JOB_ID/\$SLURM_ARRAY_TASK_ID/
+export GAUSS_EXEDIR=$HOME/scratch/opt/g09E/
+
+cd $PWD
+
+mkdir /tmp/\$SLURM_JOB_ID/
+mkdir \$GAUSS_SCRDIR
+
+FILE=\$(sed "\${SLURM_ARRAY_TASK_ID}q;d" $IN)
+
+srun \$GAUSS_EXEDIR/g09 \$FILE
+
+# Remove scratch folder
+rm -rf \$GAUSS_SCRDIR
+rm -rf /scratch/\$SLURM_JOB_ID/
+
+!EOF
+
+sbatch $SUBMIT
