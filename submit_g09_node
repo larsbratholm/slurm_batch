@@ -1,6 +1,6 @@
 #!/bin/bash
 IN=$1
-SUBMIT=${IN%.*}
+SUBMIT=${IN%.*}.sh
 PWD=`pwd`
 
 cat > $SUBMIT <<!EOF
